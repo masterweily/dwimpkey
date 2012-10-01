@@ -98,6 +98,29 @@ ORDER	products.price ASC, products.name DESC
 ```
 
 
+<h5>Relations</h5>
+
+<b>One To One</b>
+
+Lets say a store has one manager
+```java
+@Model(version=1)
+public final class Store extends ActiveRecord  
+{	
+	@Database 
+	public String 	name;
+	
+	@Database(relation="has one")
+	public 
+}
+```	
+
+<b>One To Many</b>
+
+<b>Many To Many</b>
+
+
+
 
 
 
