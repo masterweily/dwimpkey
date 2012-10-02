@@ -112,7 +112,7 @@ public final class Costumer extends ActiveRecord
 	public String 	name;
 	
 	@Field
-	public BelongsTo<Acount> acount; 	// holds a foreign key named acount_id 
+	public Acount bill; 	// holds a foreign key named bill_id 
 }
 
 public final class Acount extends ActiveRecord  
@@ -120,8 +120,8 @@ public final class Acount extends ActiveRecord
 	@Field 
 	public String 	name;
 	
-	@Relation
-	public ActiveList<Costumer> costumer;    // belive there is a forien key named costumers.aocount_id
+	@Relation(as="bill")
+	public ActiveList<Costumer> costumer;    // now related to a forien key named costumers.bill_id
 }
 ```
 Usage:
@@ -186,6 +186,10 @@ public final class Programmer extends ActiveRecord
 	public ActiveList<SourceCode> sourceCodes;
 }
 ```
+
+
+
+
 
 
 
