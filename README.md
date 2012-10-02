@@ -25,13 +25,13 @@ Here is how to generate a table named 'products' with auto incremented primary k
 @Model(version=1) // version must be > 0, incremented manualy to apply changes in the class to the db schema
 public final class Product extends ActiveRecord  
 {	
-	@Database 
+	@Field 
 	public String 	name;  // generates dataase field as slqlite TEXT
 
-	@Database 
+	@Field 
 	public double 	price;   // generates dataase field as slqlite REAL	
 	
-	@Database 
+	@Field 
 	public int barcode;   // generates dataase field as slqlite INTEGER
 	
 	public String review;  // no database field for this one
@@ -102,23 +102,90 @@ ORDER	products.price ASC, products.name DESC
 
 <b>One To One</b>
 
-Lets say a store has one manager
+Decleration:
+
 ```java
 @Model(version=1)
-public final class Store extends ActiveRecord  
+public final class Costumer extends ActiveRecord  
 {	
-	@Database 
+	@Field 
 	public String 	name;
 	
-	@Database(relation="has one")
-	public 
+	@Field
+	public BelongsTo<Acount> acount; 	// holds a foreign key named acount_id 
 }
-```	
+
+public final class Acount extends ActiveRecord  
+{	
+	@Field 
+	public String 	name;
+	
+	@Relation
+	public ActiveList<Costumer> costumer;    // belive there is a forien key named costumers.aocount_id
+}
+```
+Usage:
+
+```java
+Costumer costumer = Costumer.find(1);
+int acount_id = costumer.acount.getId();  // get the costumer's acount id with no database query
+Acount acount = costumer.acount.get();  // get the costumers's acount, with a select query.
+Acount acount2 = costumer.acount.get(); // no query this time, the data is allready loaded.
+
+Acount acount3 = Acount.find(1);
+int id = acount3.costumer.getId();  // this one will generate a query, because acounts doesnt hold a foreign key
+int id = acount3.costumer.get().getId(); // this one is better, couse now the costumer is fully loaded
+```
 
 <b>One To Many</b>
 
+decleration:
+
+```java
+@Model(version=1)
+public final class Resturant extends ActiveRecord
+{
+	@Relation(as="workPlace")
+	public ActiveList<Employee> employees;
+}
+
+@Model(version=1)
+public final class Employee extends ActiveRecord
+{
+	@Field
+	public Resturant workPlace;
+}
+```
+
+usage:
+
+```java
+ActiveList<Employee> employees = resturant.employees.get();
+```
+
+```java
+resturant.employees.add(employee);  // save an employee in the database to belong to the resturant
+```
+
 <b>Many To Many</b>
 
+decleration:
+
+```java
+@Model(version=1)
+public final class SourceCode extends ActiveRecord
+{
+	@Relation  // no need for (as="souresCode"), it's the default
+	public HasMany<Programmer> contributers;
+}
+
+@Model(version=1)
+public final class Programmer extends ActiveRecord
+{
+	@Relation(as="contributer")
+	public ActiveList<SourceCode> sourceCodes;
+}
+```
 
 
 
