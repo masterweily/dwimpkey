@@ -104,7 +104,8 @@ class Table extends SQLiteActiveRecordHelper
 	@Override
 	protected String updateTableSqlString() 
 	{
-		String sql = "DROP TABLE IF EXISTS " + this.name + "; " + this.createTableSqlString(); 		
+		String sql = "DROP TABLE IF EXISTS " + this.name + ";"; 
+		Log.d("xrx-sql", sql);
 		return sql;
 	}
 

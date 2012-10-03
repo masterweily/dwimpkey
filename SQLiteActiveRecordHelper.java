@@ -44,6 +44,7 @@ abstract class SQLiteActiveRecordHelper extends SQLiteOpenHelper
 	{
 		String sql = this.updateTableSqlString();
 		tryExecuteSql(db, sql);
+		this.onCreate(db);
 	}
 	
 	public long newRow(ActiveRecord row)

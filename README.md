@@ -25,13 +25,13 @@ Here is how to generate a table named 'products' with auto incremented primary k
 @Model(version=1) // version must be > 0, incremented manualy to apply changes in the class to the db schema
 public final class Product extends ActiveRecord  
 {	
-	@Field 
+	@Database
 	public String 	name;  // generates dataase field as slqlite TEXT
 
-	@Field 
+	@Database
 	public double 	price;   // generates dataase field as slqlite REAL	
 	
-	@Field 
+	@Database
 	public int barcode;   // generates dataase field as slqlite INTEGER
 	
 	public String review;  // no database field for this one
@@ -119,7 +119,7 @@ Decleration:
 @Model(version=1)
 public final class Costumer extends ActiveRecord  
 {	
-	@Field 
+	@Database
 	public String 	name;
 	
 	@Field
@@ -128,7 +128,7 @@ public final class Costumer extends ActiveRecord
 
 public final class Acount extends ActiveRecord  
 {	
-	@Field 
+	@Database
 	public String 	name;
 	
 	@Relation(as="bill")
