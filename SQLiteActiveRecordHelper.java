@@ -48,7 +48,7 @@ abstract class SQLiteActiveRecordHelper extends SQLiteOpenHelper
 	
 	public long newRow(ActiveRecord row)
 	{
-		SQLiteDatabase db = this.getReadableDatabase();
+		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = mapObject(row);
 		long id = -1;
 		Log.d("xrx-d", "content values: " + values);
@@ -71,12 +71,12 @@ abstract class SQLiteActiveRecordHelper extends SQLiteOpenHelper
 
 	public void updateRow(ActiveRecord row)
 	{
-		SQLiteDatabase db = this.getReadableDatabase();
+		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = mapObject(row);
 		long id = row.getId();
 		try
 		{
-			db.update(getTableName(), values, "id=?" + id, null);
+			db.update(getTableName(), values, "id=" + id, null);
 		}
 		catch (SQLiteException ex)
 		{
@@ -87,6 +87,29 @@ abstract class SQLiteActiveRecordHelper extends SQLiteOpenHelper
 		{
 			db.close();
 		}
+	}
+	
+	public boolean deleteRow(ActiveRecord row) 
+	{
+		SQLiteDatabase db = this.getWritableDatabase();
+		long id = row.getId();
+		boolean success;
+		try
+		{
+			db.delete(getTableName(), "id=" + id, null);
+			success = true;
+		}
+		catch (SQLiteException ex)
+		{
+			Log.e("xrx-sql", ex.getMessage());
+			success = false;
+			throw ex;
+		}
+		finally
+		{
+			db.close();
+		}	
+		return success;
 	}
 	
 

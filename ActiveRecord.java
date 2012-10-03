@@ -5,8 +5,9 @@ import android.content.Context;
 
 public class ActiveRecord 
 {
-    
-    private long id = 0;
+    private static final long NULL_ID = 0;
+	
+    private long id = NULL_ID;
     private static Context context = null;
     
     public static void setContext(Context newContext)
@@ -16,16 +17,26 @@ public class ActiveRecord
     
     public void save()
     {
-    	Schema s = Schema.getInstance();
-    	
-    	Table table = s.getTable(context, this.getClass() );
+    	Table table = Schema.getInstance().getTable( context, this.getClass() );
+    	if ( this.hasValidId() ) // case old record 
+    	{
+    		table.updateRow(this);  // update the record
+    	}
+    	else   //  case new record
+    	{
+    		this.id = table.newRow(this);  //  add new record to db and get the id
+    	}
+    }
+    
+    public void delete()
+    {
+    	Table table = Schema.getInstance().getTable( context, this.getClass() );
     	if ( this.hasValidId() )
     	{
-    		table.updateRow(this);
-    	}
-    	else
-    	{
-    		this.id = table.newRow(this);
+    		if ( table.deleteRow(this) )
+    		{
+    			this.id = NULL_ID;
+    		}
     	}
     }
 
