@@ -5,19 +5,42 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import activerecord.annotations.Database;
+import android.content.ContentValues;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
-class Table 
+
+/*
+ * represent a database schema of a single table, suitable to a ActiveRecord class
+ */
+class Table extends SQLiteActiveRecordHelper
 {
 	private String name;
 	private Column[] cols;
+	private Context context;
 	
-	public Table(Class modelClass) 
-	{
-		name = modelClass.getSimpleName().toLowerCase() + "s"; // pluralize
+	/*
+	 * constructor
+	 * 
+	 * @param modelClass Class, better be a subclass of ActiveRecord
+	 * 
+	 * generate database Table map (schema) for the modelClass
+	 *   
+	 */
+	public Table(Context context, Class modelClass) 
+	{	
+		super(context, modelClass); 
+		name = nameFromClass(modelClass);
+		this.context = context;
 		initCols(modelClass);
+	}
+
+	private static String nameFromClass(Class modelClass) 
+	{
+		String className = modelClass.getSimpleName();
+		return Grammar.toTableName(className);
 	}
 
 	private void initCols(Class modelClass) 
@@ -71,51 +94,31 @@ class Table
 		}
 		return false;
 	}
-
-	public void create(SQLiteDatabase db) 
-	{
-		 
-		String sql = this.sqlCreateTableString();
-		Log.d("create table string", sql);
-		
-		try
-		{
-			db.execSQL(sql);
-		}
-		catch (SQLiteException ex)
-		{
-			Log.e("create table exception", "ex.getMessage");
-		}
-		Log.d("create table", "done");
-		
-	}
 	
-	public void upgrade(SQLiteDatabase db) 
+	
+	/*
+	 * generate sql to drop the table and create a new updated version of it
+	 * 
+	 * TODO - smart-up this method so it wont necessarily drop the data
+	 */	 
+	@Override
+	protected String updateTableSqlString() 
 	{
-//		String sql = this.sqlUpgradeTableString();
-//		
-//		Log.d("create sql", sql);
-//		try
-//		{
-//			db.execSQL(sql);
-//		}
-//		catch (SQLiteException ex)
-//		{
-//			Log.e("upgrade table exception", "ex.getMessage");
-//		}
-		
+		String sql = "DROP TABLE IF EXISTS " + this.name + "; " + this.createTableSqlString(); 		
+		return sql;
 	}
 
-	private String sqlUpgradeTableString() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private String sqlCreateTableString() 
+	/*
+	 * generate sql create updated version of the table schema on the database
+	 * 
+	 * TODO - smart-up this method so it wont necessarily drop the data
+	 */
+	@Override
+	protected String createTableSqlString() 
 	{
 		String sql = 	"CREATE TABLE " + this.name + 
-						"(id INTEGER PRIMARY KEY";
-		
+				"(id INTEGER PRIMARY KEY";
+
 		for ( Column col : this.cols )
 		{
 			sql += ", " + col.getName() + " " + col.getType();
@@ -124,6 +127,36 @@ class Table
 		sql += ");";
 					
 		return sql;
+	}
+
+	@Override
+	protected String getTableName() 
+	{
+		return name;
+	}
+
+	@Override
+	protected ContentValues mapObject(ActiveRecord row) 
+	{
+		Log.d("xrx-d", "mapObject(row)");
+		ContentValues map = new ContentValues();
+		for (Column col : cols)
+		{
+			
+			String name = col.getName();
+			String value = col.getStringValue(row);
+			
+			Log.d("xrx-d", "Iterate cols- name: " + col.getName() + ", value: " + value);
+			
+			map.put(name, value);
+			
+		}
+		return map;
+	}
+
+	public Object getContext() 
+	{	
+		return context;
 	}
 
 	

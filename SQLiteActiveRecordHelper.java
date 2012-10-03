@@ -1,29 +1,106 @@
 package activerecord;
 
 import java.lang.annotation.Annotation;
+import java.sql.SQLDataException;
 
 import activerecord.annotations.Model;
 
 import android.R;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class SQLiteActiveRecordHelper extends SQLiteOpenHelper 
+abstract class SQLiteActiveRecordHelper extends SQLiteOpenHelper 
 {
-	private Class model;
+	// public
 	
+	/*
+	 * constructor 
+	 * @param context
+	 * @param model
+	 */
 	public SQLiteActiveRecordHelper(Context context, Class model) 
 	{	
 		super(	context, 
 				getDbName(),  
 				null, // factory 
 				version(model) 
-				);		
-		this.model = model;
+				);	
 	}
+	
+	@Override
+	public void onCreate(SQLiteDatabase db) 
+	{
+		String sql = this.createTableSqlString();
+		tryExecuteSql(db, sql);
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
+	{
+		String sql = this.updateTableSqlString();
+		tryExecuteSql(db, sql);
+	}
+	
+	public long newRow(ActiveRecord row)
+	{
+		SQLiteDatabase db = this.getReadableDatabase();
+		ContentValues values = mapObject(row);
+		long id = -1;
+		Log.d("xrx-d", "content values: " + values);
+		try
+		{
+			id = db.insertOrThrow(this.getTableName(), null, values);
+		}
+		catch (SQLiteException ex)
+		{
+			Log.e("xrx-sql", ex.getMessage() + "--- in SQLiteActiveRecordHelper.newRow()");
+		}
+		finally
+		{
+			db.close();
+		}
+		return id;
+	}
+	
+	
+
+	public void updateRow(ActiveRecord row)
+	{
+		SQLiteDatabase db = this.getReadableDatabase();
+		ContentValues values = mapObject(row);
+		long id = row.getId();
+		try
+		{
+			db.update(getTableName(), values, "id=?" + id, null);
+		}
+		catch (SQLiteException ex)
+		{
+			Log.e("xrx-sql", ex.getMessage());
+			throw ex;
+		}
+		finally
+		{
+			db.close();
+		}
+	}
+	
+
+	// abstract
+	
+	protected abstract ContentValues mapObject(ActiveRecord row);
+
+	protected abstract String getTableName();
+
+	protected abstract String updateTableSqlString();
+
+	protected abstract String createTableSqlString();
+	
+	// private
 
 	private static int version(Class model) 
 	{
@@ -47,19 +124,17 @@ public class SQLiteActiveRecordHelper extends SQLiteOpenHelper
 		return "AppName".toLowerCase(); // TODO
 	}
 
-	@Override
-	public void onCreate(SQLiteDatabase db) 
+		
+	private void tryExecuteSql(SQLiteDatabase db, String sql) 
 	{
-		Table table = new Table(model);
-		table.create(db);
+		try
+		{
+			db.execSQL(sql);
+		}
+		catch (SQLiteException ex)
+		{
+			Log.e("xrx-sql", ex.getMessage());
+		}
+		Log.d("xrx-sql", "sql exectue success");		
 	}
-
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
-	{
-		Table table = new Table(model);
-		table.upgrade(db);
-	}
-	
-
 }
