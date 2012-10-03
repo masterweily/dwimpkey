@@ -97,6 +97,17 @@ AND 	products.price < 200
 ORDER	products.price ASC, products.name DESC
 ```
 
+more clauses:  
+
+```java
+.join()
+```
+```java
+.limit()
+```
+```java
+.offset()
+```
 
 <h5>Relations</h5>
 
@@ -186,10 +197,36 @@ public final class Programmer extends ActiveRecord
 	public ActiveList<SourceCode> sourceCodes;
 }
 ```
+<h5>Scopes</h5>
 
+declaration:  
 
+```java
+@Model(version=1)
+public final class Page extends ActiveRecord
+{
+	@Field
+	public Category category;  
+	
+	@Field
+	public boolean active;
+	
+	@Field
+	public int position;
+	
+	public static ActiveList<Page> publicList()
+	{
+		return Page.where("active", "=", true).order("position", "ASC");
+	}
+}
+```
+usage:
 
-
+```java
+ActiveList<Page> allPublicPages = Page.publicList();  // simple use of the scope
+ActiveList<Page> somePublicPages = Page.publicList().limit(10);  // chain scope with other clauses
+ActiveList<Page> categoryPublicPages = category.pages.publicList(); // chain scope with relative query
+```
 
 
 
