@@ -22,7 +22,7 @@ Download, install and configure the library in your project
 Here is how to generate a table named 'products' with auto incremented primary key named 'id'
 
 ```java
-@Model(version=1) // version must be > 0, incremented manualy to apply changes in the class to the db schema
+@ActiveModel(version=1) // version must be > 0, incremented manualy to apply changes in the class to the db schema
 public final class Product extends ActiveRecord  
 {	
 	@Database
@@ -116,13 +116,13 @@ more clauses:
 Decleration:
 
 ```java
-@Model(version=1)
+@ActiveModel(version=1)
 public final class Costumer extends ActiveRecord  
 {	
 	@Database
 	public String 	name;
 	
-	@Field
+	@ActiveField
 	public Acount bill; 	// holds a foreign key named bill_id 
 }
 
@@ -131,7 +131,7 @@ public final class Acount extends ActiveRecord
 	@Database
 	public String 	name;
 	
-	@Relation(as="bill")
+	@ActiveRelation(as="bill")
 	public ActiveList<Costumer> costumer;    // now related to a forien key named costumers.bill_id
 }
 ```
@@ -153,17 +153,17 @@ int id = acount3.costumer.get().getId(); // this one is better, couse now the co
 decleration:
 
 ```java
-@Model(version=1)
+@ActiveModel(version=1)
 public final class Resturant extends ActiveRecord
 {
-	@Relation(as="workPlace")
+	@ActiveRelation(as="workPlace")
 	public ActiveList<Employee> employees;
 }
 
-@Model(version=1)
+@ActiveModel(version=1)
 public final class Employee extends ActiveRecord
 {
-	@Field
+	@ActiveField
 	public Resturant workPlace;
 }
 ```
@@ -183,17 +183,17 @@ resturant.employees.add(employee);  // save an employee in the database to belon
 decleration:
 
 ```java
-@Model(version=1)
+@ActiveModel(version=1)
 public final class SourceCode extends ActiveRecord
 {
-	@Relation  // no need for (as="souresCode"), it's the default
+	@ActiveRelation  // no need for (as="souresCode"), it's the default
 	public HasMany<Programmer> contributers;
 }
 
-@Model(version=1)
+@ActiveModel(version=1)
 public final class Programmer extends ActiveRecord
 {
-	@Relation(as="contributer")
+	@ActiveRelation(as="contributer")
 	public ActiveList<SourceCode> sourceCodes;
 }
 ```
@@ -202,16 +202,16 @@ public final class Programmer extends ActiveRecord
 declaration:  
 
 ```java
-@Model(version=1)
+@ActiveModel(version=1)
 public final class Page extends ActiveRecord
 {
-	@Field
+	@ActiveField
 	public Category category;  
 	
-	@Field
+	@ActiveField
 	public boolean active;
 	
-	@Field
+	@ActiveField
 	public int position;
 	
 	public static ActiveList<Page> publicList()

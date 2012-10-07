@@ -1,9 +1,11 @@
 package activerecord;
 
+import activerecord.interfaces.ActiveRecordInterface;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 
-public class ActiveRecord 
+public class ActiveRecord implements ActiveRecordInterface
 {
     private static final long NULL_ID = 0;
 	
@@ -17,7 +19,7 @@ public class ActiveRecord
     
     public void save()
     {
-    	Table table = Schema.getInstance().getTable( context, this.getClass() );
+    	ActiveTable table = Schema.getInstance().getTable( context, this.getClass() );
     	if ( this.hasValidId() ) // case old record 
     	{
     		table.updateRow(this);  // update the record
@@ -30,7 +32,7 @@ public class ActiveRecord
     
     public void delete()
     {
-    	Table table = Schema.getInstance().getTable( context, this.getClass() );
+    	ActiveTable table = Schema.getInstance().getTable( context, this.getClass() );
     	if ( this.hasValidId() )
     	{
     		if ( table.deleteRow(this) )
@@ -49,4 +51,11 @@ public class ActiveRecord
 	{	
 		return id;
 	}
+
+	public ContentValues getValues() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 }

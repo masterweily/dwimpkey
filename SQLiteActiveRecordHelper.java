@@ -52,7 +52,6 @@ abstract class SQLiteActiveRecordHelper extends SQLiteOpenHelper
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = mapObject(row);
 		long id = -1;
-		Log.d("xrx-d", "content values: " + values);
 		try
 		{
 			id = db.insertOrThrow(this.getTableName(), null, values);

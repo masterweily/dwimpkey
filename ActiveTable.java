@@ -5,8 +5,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import activerecord.annotations.Database;
+import activerecord.interfaces.ActiveTableInterface;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
@@ -15,7 +17,7 @@ import android.util.Log;
 /*
  * represent a database schema of a single table, suitable to a ActiveRecord class
  */
-class Table extends SQLiteActiveRecordHelper
+class ActiveTable extends SQLiteActiveRecordHelper implements ActiveTableInterface
 {
 	private String name;
 	private Column[] cols;
@@ -29,7 +31,7 @@ class Table extends SQLiteActiveRecordHelper
 	 * generate database Table map (schema) for the modelClass
 	 *   
 	 */
-	public Table(Context context, Class modelClass) 
+	public ActiveTable(Context context, Class modelClass) 
 	{	
 		super(context, modelClass); 
 		name = nameFromClass(modelClass);
@@ -155,9 +157,29 @@ class Table extends SQLiteActiveRecordHelper
 		return map;
 	}
 
-	public Object getContext() 
+	public Context getContext() 
 	{	
 		return context;
+	}
+
+	public Class getRecordClass() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public int getVersion() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public ActiveRecord parseCursor(Cursor cursor) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	
