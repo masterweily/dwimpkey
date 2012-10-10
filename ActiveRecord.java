@@ -3,7 +3,6 @@ package activerecord;
 import activerecord.interfaces.ActiveRecordInterface;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 
 public class ActiveRecord implements ActiveRecordInterface
 {
@@ -14,28 +13,83 @@ public class ActiveRecord implements ActiveRecordInterface
     
     public static void setContext(Context newContext)
     {
-    	context = newContext;
+    	context = newContext; 		
     }
     
-    public void save()
+   
+	public static ActiveRecord find(long id)
     {
-    	ActiveTable table = Schema.getInstance().getTable( context, this.getClass() );
+		ActiveList<ActiveRecord> list = where("id=" + id);
+		ActiveRecord found = null;
+    	if ( list.size() > 0 )
+    	{
+    		found = list.get(0);
+    	}
+    	return found;  	
+    }
+    
+    public static ActiveList<ActiveRecord> where(String statement)
+    {
+    	return selfInstance().newList().where(statement);   	
+    }
+    
+    public static ActiveList<ActiveRecord> order(String statement)
+    {
+    	return selfInstance().newList().order(statement);
+    }
+    
+    public static ActiveList<ActiveRecord> limit(long limit)
+    {
+    	return selfInstance().newList().limit(limit);   	
+    }
+    
+    
+    private ActiveList<ActiveRecord> newList() 
+    {
+    	return new ActiveList<ActiveRecord>
+    	( 
+    			ActiveSchema.getInstance()
+    					.getTable(context, this.getClass())
+    	);
+	}
+
+	
+	private static ActiveRecord selfInstance() 
+	{
+		
+		try {
+			return (ActiveRecord) selfClass().getConstructor().newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null; 		
+	}
+	
+	private static Class<?> selfClass()
+	{
+		return new Object() {}.getClass().getEnclosingClass();
+	}
+
+	public void save()
+    {
+    	ActiveTable table = ActiveSchema.getInstance().getTable( context, this.getClass() );  
+    	
     	if ( this.hasValidId() ) // case old record 
     	{
-    		table.updateRow(this);  // update the record
+    		new ActiveSqlExecuter(table).updateRow(this);  // update the record
     	}
     	else   //  case new record
     	{
-    		this.id = table.newRow(this);  //  add new record to db and get the id
+    		this.id = new ActiveSqlExecuter(table).addRow(this);  //  add new record to db and get the id
     	}
     }
     
     public void delete()
     {
-    	ActiveTable table = Schema.getInstance().getTable( context, this.getClass() );
+    	ActiveTable table = ActiveSchema.getInstance().getTable( context, this.getClass() );
     	if ( this.hasValidId() )
     	{
-    		if ( table.deleteRow(this) )
+    		if ( new ActiveSqlExecuter(table).deleteRow(this) )
     		{
     			this.id = NULL_ID;
     		}
@@ -52,10 +106,18 @@ public class ActiveRecord implements ActiveRecordInterface
 		return id;
 	}
 
-	public ContentValues getValues() {
-		// TODO Auto-generated method stub
-		return null;
+	public ContentValues getValues() 
+	{
+		ContentValues values = new ContentValues();
+    	ActiveTable table = ActiveSchema.getInstance().getTable( context, this.getClass() );
+    	ActiveColumn[] cols = table.getCols();
+    	
+    	for ( ActiveColumn col : cols )
+    	{
+    		values.put(	col.getName(),            	// key
+    					col.getStringValue(this)	// value
+    					);
+    	}
+		return values;
 	}
-
-	
 }

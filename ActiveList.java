@@ -8,17 +8,19 @@ import java.util.ListIterator;
 
 import activerecord.ActiveRecord;
 import activerecord.interfaces.ActiveListInterface;
+import activerecord.interfaces.ActiveSelectInterface;
 
 
-class ActiveList<E extends ActiveRecord> extends ActiveSelect implements ActiveListInterface<ActiveRecord>  
+class ActiveList<E extends ActiveRecord> implements ActiveListInterface<ActiveRecord>  
 {
+	
+	private ArrayList<ActiveRecord> list = null;
+	private ActiveSelect select = null;
+	
 	public ActiveList(ActiveTable fromTable) 
 	{
-		super(fromTable);
+		select = new ActiveSelect(fromTable);
 	}
-
-
-	private ArrayList<ActiveRecord> list = null;
 	
 	/*
 	 *  return the list member
@@ -28,7 +30,7 @@ class ActiveList<E extends ActiveRecord> extends ActiveSelect implements ActiveL
 	{
 		if ( list == null )
 		{
-			list = super.load();
+			list = select.load();
 		}
 		return list;
 	}
@@ -177,10 +179,10 @@ class ActiveList<E extends ActiveRecord> extends ActiveSelect implements ActiveL
 	}
 	
 	
-	public ActiveList reload() 
+	public ActiveList<ActiveRecord> reload() 
 	{
-		this.list = super.load();
-		return this;
+		this.list = select.load();
+		return (ActiveList<ActiveRecord>) this;
 	}
 
 
@@ -199,6 +201,75 @@ class ActiveList<E extends ActiveRecord> extends ActiveSelect implements ActiveL
 		{
 			record.delete();
 		}		
+	}
+
+
+	public ActiveList<ActiveRecord> where(String where) 
+	{
+		select.where(where);
+		return (ActiveList<ActiveRecord>) this;
+	}
+
+
+	public ActiveList<ActiveRecord> order(String by) 
+	{
+		select.order(by);
+		return (ActiveList<ActiveRecord>) this;
+	}
+
+
+	public ActiveList<ActiveRecord> limit(long limit) 
+	{
+		select.limit(limit);
+		return (ActiveList<ActiveRecord>) this;
+	}
+
+
+	public ActiveList<ActiveRecord> load() 
+	{
+		return this.reload();
+	}
+
+
+	public boolean getDistinct()
+	{
+		return select.getDistinct();
+	}
+
+
+	public String getTableName() {
+		return select.getTableName();
+	}
+
+
+	public String[] getCulomns() {
+		return select.getCulomns();
+	}
+
+
+	public String getWhere() {
+		return select.getWhere();
+	}
+
+
+	public String getGroup() {
+		return select.getGroup();
+	}
+
+
+	public String getHaving() {
+		return select.getHaving();
+	}
+
+
+	public String getOrder() 
+	{
+		return select.getOrder();
+	}
+
+
+	public String getLimit() {
+		return select.getLimit();
 	}
 
 }

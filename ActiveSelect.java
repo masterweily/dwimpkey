@@ -61,7 +61,7 @@ public class ActiveSelect implements ActiveSelectInterface
 
 	public String getTableName() 
 	{
-		return fromTable.getTableName();
+		return fromTable.getName();
 	}
 
 	public String[] getCulomns() {
@@ -114,15 +114,5 @@ public class ActiveSelect implements ActiveSelectInterface
 	        }
 	    }
 	    return buffer.toString();
-	}
-
-
-
-
-
-
-	
-	
-	
-	
+	}	
 }

@@ -43,11 +43,15 @@ public class ActiveSchema implements ActiveSchemaInterface<ActiveTable>
 	private ActiveTable confirmTableInstance(Context context, Class modelClass) 
 	{
 		ActiveTable table = tables.get(modelClass); // search for table for the class		
-		if ( table == null || !context.equals(table.getContext()) )  // if not found => create one
+		if ( table == null )  // if not found => create one
 		{
 			table = new ActiveTable(context, modelClass);
 			tables.put(modelClass, table);
-		}		
+		}
+		if (!context.equals(table.getContext()))
+		{
+			table.setContext(context);
+		}
 		return table;
 	}
 
@@ -59,8 +63,17 @@ public class ActiveSchema implements ActiveSchemaInterface<ActiveTable>
 
 	private void buildSchema()
 	{
-		// TODO Auto-generated method stub
+		tables.clear();
 		
+		for ( Class<?> modelClass : modelClassesList() )
+		{
+			tables.put(modelClass, new ActiveTable(null, modelClass));
+		}		
+	}
+
+	private Class<?>[] modelClassesList() 
+	{
+		return ActiveConfig.getActiveModels();		
 	}
 
 	public String getDatabaseName() 

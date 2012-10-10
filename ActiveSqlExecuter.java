@@ -1,5 +1,6 @@
 package activerecord;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import activerecord.interfaces.ActiveSqlExecuterInterface;
@@ -93,7 +94,7 @@ public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExec
 		long id = -1;
 		try
 		{
-			id = db.insertOrThrow( table.getTableName(), null, values);
+			id = db.insertOrThrow( table.getName(), null, values);
 		}
 		catch (SQLiteException ex)
 		{
@@ -113,7 +114,7 @@ public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExec
 		long id = row.getId();
 		try
 		{
-			db.update(table.getTableName(), values, "id=" + id, null);
+			db.update(table.getName(), values, "id=" + id, null);
 		}
 		catch (SQLiteException ex)
 		{
@@ -133,7 +134,7 @@ public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExec
 		boolean success;
 		try
 		{
-			db.delete(table.getTableName(), "id=" + id, null);
+			db.delete(table.getName(), "id=" + id, null);
 			success = true;
 		}
 		catch (SQLiteException ex)
@@ -155,10 +156,25 @@ public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExec
 		ActiveTable[] tables = ActiveSchema.getInstance().getTables();
 		
 		for ( ActiveTable table : tables )
-		{
-			String sql = table.createTableSqlString();
+		{		
+			String sql = createTableSqlString(table);
 			tryExecuteSql(db, sql);
 		}
+	}
+
+	private String createTableSqlString(ActiveTable table) 
+	{
+		String sql = 	"CREATE TABLE " + table.getName() + 
+				"(id INTEGER PRIMARY KEY";
+
+		for ( ActiveColumn col : table.getCols() )
+		{
+			sql += ", " + col.getName() + " " + col.getType();
+		}
+
+		sql += ");";
+
+		return sql;
 	}
 
 	@Override
@@ -168,13 +184,19 @@ public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExec
 		
 		for ( ActiveTable table : tables )
 		{
-			String sql = table.updateTableSqlString();
+			String sql = updateTableSqlString(table);
 			tryExecuteSql(db, sql);
 		}
 		this.onCreate(db);
 	}
 
 	
+	private String updateTableSqlString(ActiveTable table) 
+	{
+		String sql = "DROP TABLE IF EXISTS " + table.getName() + ";"; 
+		return sql;
+	}
+
 	private void tryExecuteSql(SQLiteDatabase db, String sql) 
 	{
 		try
