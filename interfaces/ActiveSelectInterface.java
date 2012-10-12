@@ -2,16 +2,16 @@ package activerecord.interfaces;
 
 import java.util.List;
 
-public interface ActiveSelectInterface 
+public interface ActiveSelectInterface<R extends ActiveRecordInterface> 
 {
 	
-	public ActiveSelectInterface 		where	(String where);
+	public ActiveSelectInterface<R> 		where	(String where);
 	
-	public ActiveSelectInterface 		order	(String by);
+	public ActiveSelectInterface<R> 		order	(String by);
 	
-	public ActiveSelectInterface 		limit	(long limit);
+	public ActiveSelectInterface<R> 		limit	(long limit);
 	
-	public List							load	();
+	public List<R>							load	();
 	
 	
 	public boolean getDistinct();

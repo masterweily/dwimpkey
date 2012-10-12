@@ -7,19 +7,19 @@ import java.util.Iterator;
 import activerecord.interfaces.ActiveSelectInterface;
 
 
-public class ActiveSelect implements ActiveSelectInterface 
+public class ActiveSelect<R extends ActiveRecord> implements ActiveSelectInterface<R> 
 {
 		
-	private ActiveTable fromTable;
+	private ActiveTable<R> 		fromTable;
 	
-	private ArrayList<String> wheres;
+	private ArrayList<String> 	wheres;
 	
-	private ArrayList<String> orders;
+	private ArrayList<String> 	orders;
 	
 	private String	limit;
 	
 
-	public ActiveSelect(ActiveTable fromTable)
+	public ActiveSelect(ActiveTable<R> fromTable)
 	{
 		this.fromTable = fromTable;
 		
@@ -28,29 +28,29 @@ public class ActiveSelect implements ActiveSelectInterface
 	}
 	
 	
-	public ActiveSelect where(String newWhere) 
+	public ActiveSelect<R> where(String newWhere) 
 	{
 		wheres.add(newWhere);
 		return this;
 	}
 
 
-	public ActiveSelect order(String newOrder) 
+	public ActiveSelect<R> order(String newOrder) 
 	{
 		orders.add(newOrder);
 		return this;
 	}
 
-	public ActiveSelect limit(long limit) 
+	public ActiveSelect<R> limit(long limit) 
 	{
 		this.limit =  "" + limit;
 		return this;
 	}
 
 	
-	public ArrayList<ActiveRecord> load() 
+	public ArrayList<R> load() 
 	{
-		return new ActiveSqlExecuter(fromTable).select(this);	
+		return new ActiveSqlExecuter<R, ActiveSelect<R>>(fromTable).select(this);
 	}
 
 
@@ -101,12 +101,11 @@ public class ActiveSelect implements ActiveSelectInterface
 		return limit;
 	}
 
-
 	
-	public static String join(Collection s, String delimiter) 
+	public static String join(Collection<String> s, String delimiter) 
 	{
 	    StringBuffer buffer = new StringBuffer();
-	    Iterator iter = s.iterator();
+	    Iterator<String> iter = s.iterator();
 	    while (iter.hasNext()) {
 	        buffer.append(iter.next());
 	        if (iter.hasNext()) {

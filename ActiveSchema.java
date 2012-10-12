@@ -1,22 +1,24 @@
 package activerecord;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import activerecord.interfaces.ActiveSchemaInterface;
 import android.content.Context;
+import android.util.Log;
 
-public class ActiveSchema implements ActiveSchemaInterface<ActiveTable> 
+public class ActiveSchema implements ActiveSchemaInterface<ActiveTable<?>> 
 {
 
 	// single instance
 	static private ActiveSchema instance = null;
 		
-	private HashMap<Class,ActiveTable> tables;
+	private HashMap<Class<?>,ActiveTable<?>> tables;
 		
 	// private constructor
 	private ActiveSchema()
 	{
-		this.tables = new HashMap<Class,ActiveTable>();
+		this.tables = new HashMap<Class<?>,ActiveTable<?>>();
 	}
 	
 	public static ActiveSchema getInstance() 
@@ -34,18 +36,18 @@ public class ActiveSchema implements ActiveSchemaInterface<ActiveTable>
 	 * 
 	 * @param modelClass
 	 */
-	public ActiveTable getTable(Context context, Class modelClass) 
+	public ActiveTable<?> getTable(Context context, Class<?> modelClass) 
 	{
-		ActiveTable table = confirmTableInstance(context, modelClass);				
+		ActiveTable<?> table = confirmTableInstance(context, modelClass);				
 		return table;
 	}
 
-	private ActiveTable confirmTableInstance(Context context, Class modelClass) 
+	private ActiveTable<?> confirmTableInstance(Context context, Class<?> modelClass) 
 	{
-		ActiveTable table = tables.get(modelClass); // search for table for the class		
+		ActiveTable<?> table = tables.get(modelClass); // search for table for the class		
 		if ( table == null )  // if not found => create one
 		{
-			table = new ActiveTable(context, modelClass);
+			table = new ActiveTable<ActiveRecord>(context, modelClass);
 			tables.put(modelClass, table);
 		}
 		if (!context.equals(table.getContext()))
@@ -55,20 +57,24 @@ public class ActiveSchema implements ActiveSchemaInterface<ActiveTable>
 		return table;
 	}
 
-	public ActiveTable[] getTables() 
+	public Collection<ActiveTable<?>> getTables() 
 	{
 	    buildSchema();
-	    return (ActiveTable[]) tables.values().toArray();	    
+	    Collection<ActiveTable<?>> values = tables.values();
+	    
+	    return values;	    
 	}
 
 	private void buildSchema()
 	{
 		tables.clear();
+		Context context = ActiveRecord.getContext();
 		
 		for ( Class<?> modelClass : modelClassesList() )
 		{
-			tables.put(modelClass, new ActiveTable(null, modelClass));
-		}		
+			tables.put(modelClass, new ActiveTable<ActiveRecord>(context, modelClass));
+			Log.d("Schema" , "Class name: " + modelClass.getName());
+		}			
 	}
 
 	private Class<?>[] modelClassesList() 

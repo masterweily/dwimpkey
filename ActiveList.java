@@ -8,25 +8,26 @@ import java.util.ListIterator;
 
 import activerecord.ActiveRecord;
 import activerecord.interfaces.ActiveListInterface;
-import activerecord.interfaces.ActiveSelectInterface;
 
 
-class ActiveList<E extends ActiveRecord> implements ActiveListInterface<ActiveRecord>  
+class ActiveList<R extends ActiveRecord> implements ActiveListInterface<R>  
 {
 	
-	private ArrayList<ActiveRecord> list = null;
-	private ActiveSelect select = null;
+	private ArrayList<R> list = null;
+	private ActiveSelect<R> select = null;
 	
-	public ActiveList(ActiveTable fromTable) 
+	
+	
+	public ActiveList(ActiveTable<R> fromTable) 
 	{
-		select = new ActiveSelect(fromTable);
+		select = new ActiveSelect<R>(fromTable);
 	}
 	
 	/*
 	 *  return the list member
 	 *  if null, instantiate it by executing the select
 	 */	
-	private ArrayList<ActiveRecord> getList()
+	private ArrayList<R> getList()
 	{
 		if ( list == null )
 		{
@@ -44,32 +45,18 @@ class ActiveList<E extends ActiveRecord> implements ActiveListInterface<ActiveRe
 	}
 
 
-	public boolean add(ActiveRecord object) 
+	public boolean add(R object) 
 	{
 		return getList().add(object);
 	}
 
 
-	public void add(int location, ActiveRecord object) 
+	public void add(int location, R object) 
 	{
 		getList().add(location,object);
 	}
 
-
-	public boolean addAll(Collection<? extends ActiveRecord> arg0) 
-	{
-		return getList().addAll(arg0);
-	}
-
-
-	public boolean addAll(int arg0,
-			Collection<? extends ActiveRecord> arg1) 
-	{
-		return getList().addAll(arg0, arg1);
-	}
-
-
-	public ActiveRecord get(int location) 
+	public R get(int location) 
 	{
 		return getList().get(location);
 	}
@@ -87,7 +74,7 @@ class ActiveList<E extends ActiveRecord> implements ActiveListInterface<ActiveRe
 	}
 
 
-	public Iterator<ActiveRecord> iterator() 
+	public Iterator<R> iterator() 
 	{
 		return getList().iterator();
 	}
@@ -99,19 +86,19 @@ class ActiveList<E extends ActiveRecord> implements ActiveListInterface<ActiveRe
 	}
 
 
-	public ListIterator<ActiveRecord> listIterator() 
+	public ListIterator<R> listIterator() 
 	{
 		return getList().listIterator();
 	}
 
 
-	public ListIterator<ActiveRecord> listIterator(int location) 
+	public ListIterator<R> listIterator(int location) 
 	{
 		return getList().listIterator(location);
 	}
 
 
-	public ActiveRecord remove(int location) 
+	public R remove(int location) 
 	{
 		return getList().remove(location);
 	}
@@ -142,7 +129,7 @@ class ActiveList<E extends ActiveRecord> implements ActiveListInterface<ActiveRe
 	}
 
 
-	public List<ActiveRecord> subList(int start, int end) 
+	public List<R> subList(int start, int end) 
 	{
 		return getList().subList(start, end);
 	}
@@ -173,16 +160,16 @@ class ActiveList<E extends ActiveRecord> implements ActiveListInterface<ActiveRe
 
 
 
-	public ActiveRecord set(int location, ActiveRecord object) 
+	public R set(int location, R object) 
 	{
 		return getList().set(location, object);
 	}
 	
 	
-	public ActiveList<ActiveRecord> reload() 
+	public ActiveList<R> reload() 
 	{
 		this.list = select.load();
-		return (ActiveList<ActiveRecord>) this;
+		return this;
 	}
 
 
@@ -204,28 +191,28 @@ class ActiveList<E extends ActiveRecord> implements ActiveListInterface<ActiveRe
 	}
 
 
-	public ActiveList<ActiveRecord> where(String where) 
+	public ActiveList<R> where(String where) 
 	{
 		select.where(where);
-		return (ActiveList<ActiveRecord>) this;
+		return this;
 	}
 
 
-	public ActiveList<ActiveRecord> order(String by) 
+	public ActiveList<R> order(String by) 
 	{
 		select.order(by);
-		return (ActiveList<ActiveRecord>) this;
+		return this;
 	}
 
 
-	public ActiveList<ActiveRecord> limit(long limit) 
+	public ActiveList<R> limit(long limit) 
 	{
 		select.limit(limit);
-		return (ActiveList<ActiveRecord>) this;
+		return this;
 	}
 
 
-	public ActiveList<ActiveRecord> load() 
+	public ActiveList<R> load() 
 	{
 		return this.reload();
 	}
@@ -271,5 +258,19 @@ class ActiveList<E extends ActiveRecord> implements ActiveListInterface<ActiveRe
 	public String getLimit() {
 		return select.getLimit();
 	}
+
+	public boolean addAll(Collection<? extends R> collection) 
+	{
+		return list.addAll(collection);
+	}
+
+	public boolean addAll(int index, Collection<? extends R> collection) 
+	{
+		return list.addAll(index, collection);
+	}
+
+	
+
+	
 
 }

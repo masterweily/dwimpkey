@@ -6,23 +6,20 @@ import java.util.ArrayList;
 
 import activerecord.annotations.ActiveField;
 import activerecord.interfaces.ActiveTableInterface;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 
 /*
  * represent a database schema of a single table, suitable to a ActiveRecord class
  */
-class ActiveTable implements ActiveTableInterface
+class ActiveTable<R extends ActiveRecord> implements ActiveTableInterface<R>
 {
 	private String name;
 	private ActiveColumn[] cols;
 	private Context context;
-	private Class modelClass;
+	private Class<?> modelClass;
 	
 	/*
 	 * constructor
@@ -32,7 +29,7 @@ class ActiveTable implements ActiveTableInterface
 	 * generate database Table map (schema) for the modelClass
 	 *   
 	 */
-	public ActiveTable(Context context, Class modelClass) 
+	public ActiveTable(Context context, Class<?> modelClass) 
 	{	
 		this.name = nameFromClass(modelClass);
 		this.context = context;
@@ -40,13 +37,13 @@ class ActiveTable implements ActiveTableInterface
 		initCols(modelClass);
 	}
 
-	private static String nameFromClass(Class modelClass) 
+	private static String nameFromClass(Class<?> modelClass) 
 	{
 		String className = modelClass.getSimpleName();
 		return ActiveGrammar.toTableName(className);
 	}
 
-	private void initCols(Class modelClass) 
+	private void initCols(Class<?> modelClass) 
 	{
 		Field[] fields = getDatabaseFields(modelClass);
 		
@@ -58,7 +55,7 @@ class ActiveTable implements ActiveTableInterface
 		}
 	}
 
-	private Field[] getDatabaseFields(Class modelClass) 
+	private Field[] getDatabaseFields(Class<?> modelClass) 
 	{		
 		Field[] allFields = modelClass.getDeclaredFields();
 		
@@ -104,7 +101,7 @@ class ActiveTable implements ActiveTableInterface
 		return context;
 	}
 
-	public Class getModelClass() {
+	public Class<?> getModelClass() {
 		return modelClass;
 	}
 
@@ -114,26 +111,32 @@ class ActiveTable implements ActiveTableInterface
 	}
 
 
-	public ActiveRecord parseCursor(Cursor cursor) {
-		// TODO Auto-generated method stub
-		return null;
+	public R parseCursor(Cursor cursor) 
+	{
+		R newModel = null;
+		try 
+		{
+			newModel = (R) modelClass.getConstructor(Cursor.class).newInstance(cursor);
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			return null;
+		}
+		return newModel;
 	}
 
 	public ActiveColumn[] getCols() {
 		return cols;
 	}
 
-	public void setContext(Context context) {
+	public void setContext(Context context) 
+	{
 		this.context = context;
 		
 	}
 
-	public Class getRecordClass() {
-		return getModelClass();
-	}
-
 	
-
 	
 
 }

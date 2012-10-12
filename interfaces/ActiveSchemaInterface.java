@@ -1,12 +1,13 @@
 package activerecord.interfaces;
 
-import java.util.List;
+import java.util.Collection;
 
-public interface ActiveSchemaInterface< T extends ActiveTableInterface >
+
+public interface ActiveSchemaInterface< T extends ActiveTableInterface<?> >
 {
 	// public static ActiveSchemaInterface getInstance();
 	
-	public T[] getTables();
+	public Collection<T> getTables();
 	
 	public String getDatabaseName();
 	

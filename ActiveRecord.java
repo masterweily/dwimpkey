@@ -3,6 +3,7 @@ package activerecord;
 import activerecord.interfaces.ActiveRecordInterface;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 
 public class ActiveRecord implements ActiveRecordInterface
 {
@@ -11,82 +12,84 @@ public class ActiveRecord implements ActiveRecordInterface
     private long id = NULL_ID;
     private static Context context = null;
     
-    public static void setContext(Context newContext)
+    public ActiveRecord()
+    {
+    	super();
+    }
+    
+    public ActiveRecord(Cursor cursor)
+    {
+    	for ( ActiveColumn col : getCols() )
+    	{
+    		try 
+    		{
+				col.trySetValueFromCursor( this, cursor );
+			} 
+    		catch (Exception e) 
+    		{
+				e.printStackTrace();
+			} 
+    	}
+    	id = findId(cursor);
+    }
+   
+	private long findId(Cursor cursor) 
+	{
+		int index = cursor.getColumnIndex("id");
+		return cursor.getInt(index);
+	}
+
+	public static void setContext(Context newContext)
     {
     	context = newContext; 		
     }
     
    
-	public static ActiveRecord find(long id)
-    {
-		ActiveList<ActiveRecord> list = where("id=" + id);
-		ActiveRecord found = null;
-    	if ( list.size() > 0 )
-    	{
-    		found = list.get(0);
-    	}
-    	return found;  	
-    }
-    
-    public static ActiveList<ActiveRecord> where(String statement)
-    {
-    	return selfInstance().newList().where(statement);   	
-    }
-    
-    public static ActiveList<ActiveRecord> order(String statement)
-    {
-    	return selfInstance().newList().order(statement);
-    }
-    
-    public static ActiveList<ActiveRecord> limit(long limit)
-    {
-    	return selfInstance().newList().limit(limit);   	
-    }
-    
-    
-    private ActiveList<ActiveRecord> newList() 
-    {
-    	return new ActiveList<ActiveRecord>
-    	( 
-    			ActiveSchema.getInstance()
-    					.getTable(context, this.getClass())
-    	);
-	}
+     
+//    private ActiveList<ActiveRecord> newList() 
+//    {
+//    	return new ActiveList<ActiveRecord>
+//    	( 
+//    			ActiveSchema.getInstance()
+//    					.getTable(context, this.getClass())
+//    	);
+//	}
 
 	
-	private static ActiveRecord selfInstance() 
-	{
-		
-		try {
-			return (ActiveRecord) selfClass().getConstructor().newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null; 		
-	}
-	
-	private static Class<?> selfClass()
-	{
-		return new Object() {}.getClass().getEnclosingClass();
-	}
+//	private static ActiveRecord selfInstance() 
+//	{
+//		
+//		try {
+//			return (ActiveRecord) selfClass().getConstructor().newInstance();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return null; 		
+//	}
+//	
+//	private static Class<?> selfClass()
+//	{
+//		return new Object() {}.getClass().getEnclosingClass();
+//	}
 
 	public void save()
     {
-    	ActiveTable table = ActiveSchema.getInstance().getTable( context, this.getClass() );  
+    	ActiveTable<?> table = ActiveSchema.getInstance().getTable( context, this.getClass() ); 
+    	ActiveSqlExecuter executer = new ActiveSqlExecuter(table);
     	
     	if ( this.hasValidId() ) // case old record 
     	{
-    		new ActiveSqlExecuter(table).updateRow(this);  // update the record
+    		executer.updateRow(this);  // update the record
     	}
     	else   //  case new record
     	{
-    		this.id = new ActiveSqlExecuter(table).addRow(this);  //  add new record to db and get the id
+    		this.id = executer.addRow(this);  //  add new record to db and get the id
     	}
     }
     
     public void delete()
     {
-    	ActiveTable table = ActiveSchema.getInstance().getTable( context, this.getClass() );
+    	ActiveTable<?> table = ActiveSchema.getInstance().getTable( context, this.getClass() );
     	if ( this.hasValidId() )
     	{
     		if ( new ActiveSqlExecuter(table).deleteRow(this) )
@@ -105,19 +108,31 @@ public class ActiveRecord implements ActiveRecordInterface
 	{	
 		return id;
 	}
+	
+	private ActiveTable<?> getTable()
+	{
+		return ActiveSchema.getInstance().getTable( context, this.getClass() );
+	}
+	
+	private ActiveColumn[] getCols()
+	{
+		return getTable().getCols();
+	}
 
 	public ContentValues getValues() 
 	{
 		ContentValues values = new ContentValues();
-    	ActiveTable table = ActiveSchema.getInstance().getTable( context, this.getClass() );
-    	ActiveColumn[] cols = table.getCols();
     	
-    	for ( ActiveColumn col : cols )
+    	for ( ActiveColumn col : getCols() )
     	{
     		values.put(	col.getName(),            	// key
     					col.getStringValue(this)	// value
     					);
     	}
 		return values;
+	}
+
+	public static Context getContext() {
+		return context;
 	}
 }

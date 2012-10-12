@@ -1,8 +1,10 @@
 package activerecord;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import activerecord.interfaces.ActiveRecordInterface;
 import activerecord.interfaces.ActiveSqlExecuterInterface;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -13,39 +15,36 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
 
 
-public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExecuterInterface<ActiveRecord,ActiveSelect,ActiveTable> 
+public class ActiveSqlExecuter<R extends ActiveRecord, S extends ActiveSelect<R>> 
+			implements ActiveSqlExecuterInterface<R,S> 
 {
 
-	private ActiveTable table;
+	private ActiveTable<R> table;
+	
 
-	public ActiveSqlExecuter(ActiveTable table) 
+	public ActiveSqlExecuter(ActiveTable<R> fromTable) 
 	{
-		super(		table.getContext(),     						// context
-					ActiveSchema.getInstance().getDatabaseName(),   // db name
-					null, 											// factory
-					ActiveSchema.getInstance().getVersion()			// version	
-					);
-		this.table = table;
+		table = fromTable;
 	}
 
-	public ArrayList<ActiveRecord> select(ActiveSelect select) 
+	public ArrayList<R> select(S activeSelect) 
 	{
 		String sql = SQLiteQueryBuilder.buildQueryString( 
-				select.getDistinct(),  		    // distinct 
-				select.getTableName(), 			// table name
-				select.getCulomns(), 			// columns
-				select.getWhere(), 				// where
-				select.getGroup(), 			    // group by
-				select.getHaving(), 			// having
-				select.getOrder(),				// orderBy 
-				select.getLimit()				// limit
+				activeSelect.getDistinct(),  		    // distinct 
+				activeSelect.getTableName(), 			// table name
+				activeSelect.getCulomns(), 			// columns
+				activeSelect.getWhere(), 				// where
+				activeSelect.getGroup(), 			    // group by
+				activeSelect.getHaving(), 			// having
+				activeSelect.getOrder(),				// orderBy 
+				activeSelect.getLimit()				// limit
 				);
 		
-		SQLiteDatabase db = this.getWritableDatabase();
+		SQLiteDatabase db = ActiveSqlHelper.getInstance(table).getWritableDatabase();
 		
 		Cursor cursor = db.rawQuery(sql, null);
 		
-		ArrayList<ActiveRecord> records = new ArrayList<ActiveRecord>();
+		ArrayList<R> records = new ArrayList<R>();
 		
 		while ( cursor.moveToNext() )
 		{
@@ -58,7 +57,7 @@ public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExec
 		return records;
 	}
 
-	public ActiveRecord find(ActiveTable table, long id) 
+	public R find(long id) 
 	{
 		String sql = SQLiteQueryBuilder.buildQueryString( 
 						false,  		// distinct 
@@ -71,15 +70,15 @@ public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExec
 						"1"			    // limit
 						);
 		
-		SQLiteDatabase db = this.getWritableDatabase();
+		SQLiteDatabase db = ActiveSqlHelper.getInstance(table).getWritableDatabase();
 		
 		Cursor cursor = db.rawQuery(sql, null);
 		
-		ActiveRecord record = null;
+		R record = null;
 		
 		if ( cursor.moveToNext() )
 		{
-			record =  table.parseCursor(cursor);
+			record =  (R) table.parseCursor(cursor);
 		}
 		cursor.close();
 		db.close();
@@ -87,10 +86,10 @@ public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExec
 		return record;
 	}
 
-	public long addRow(ActiveRecord record)
+	public long addRow(ActiveRecord activeRecord)
 	{
-		SQLiteDatabase db = this.getWritableDatabase();
-		ContentValues values = record.getValues();
+		SQLiteDatabase db = ActiveSqlHelper.getInstance(table).getWritableDatabase();
+		ContentValues values = activeRecord.getValues();
 		long id = -1;
 		try
 		{
@@ -107,11 +106,11 @@ public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExec
 		return id;
 	}
 
-	public void updateRow(ActiveRecord row)
+	public void updateRow(ActiveRecord activeRecord)
 	{
-		SQLiteDatabase db = this.getWritableDatabase();
-		ContentValues values = row.getValues();
-		long id = row.getId();
+		SQLiteDatabase db = ActiveSqlHelper.getInstance(table).getWritableDatabase();
+		ContentValues values = activeRecord.getValues();
+		long id = activeRecord.getId();
 		try
 		{
 			db.update(table.getName(), values, "id=" + id, null);
@@ -127,10 +126,10 @@ public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExec
 		}
 	}
 
-	public boolean deleteRow(ActiveRecord row) 
+	public boolean deleteRow(ActiveRecord activeRecord) 
 	{
-		SQLiteDatabase db = this.getWritableDatabase();
-		long id = row.getId();
+		SQLiteDatabase db = ActiveSqlHelper.getInstance(table).getWritableDatabase();
+		long id = activeRecord.getId();
 		boolean success;
 		try
 		{
@@ -150,67 +149,5 @@ public class ActiveSqlExecuter extends SQLiteOpenHelper implements ActiveSqlExec
 		return success;
 	}
 
-	@Override
-	public void onCreate(SQLiteDatabase db) 
-	{
-		ActiveTable[] tables = ActiveSchema.getInstance().getTables();
-		
-		for ( ActiveTable table : tables )
-		{		
-			String sql = createTableSqlString(table);
-			tryExecuteSql(db, sql);
-		}
-	}
-
-	private String createTableSqlString(ActiveTable table) 
-	{
-		String sql = 	"CREATE TABLE " + table.getName() + 
-				"(id INTEGER PRIMARY KEY";
-
-		for ( ActiveColumn col : table.getCols() )
-		{
-			sql += ", " + col.getName() + " " + col.getType();
-		}
-
-		sql += ");";
-
-		return sql;
-	}
-
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
-	{
-		ActiveTable[] tables = ActiveSchema.getInstance().getTables();
-		
-		for ( ActiveTable table : tables )
-		{
-			String sql = updateTableSqlString(table);
-			tryExecuteSql(db, sql);
-		}
-		this.onCreate(db);
-	}
-
 	
-	private String updateTableSqlString(ActiveTable table) 
-	{
-		String sql = "DROP TABLE IF EXISTS " + table.getName() + ";"; 
-		return sql;
-	}
-
-	private void tryExecuteSql(SQLiteDatabase db, String sql) 
-	{
-		try
-		{
-			db.execSQL(sql);
-		}
-		catch (SQLiteException ex)
-		{
-			Log.e("xrx-sql", ex.getMessage());
-		}
-		finally
-		{
-			db.close();
-		}
-		Log.d("xrx-sql", "sql exectue success");		
-	}
 }

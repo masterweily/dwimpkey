@@ -3,9 +3,9 @@ package activerecord.interfaces;
 import java.util.List;
 
 
-public interface ActiveListInterface<E extends ActiveRecordInterface> extends ActiveSelectInterface, List<E> 
+public interface ActiveListInterface<R extends ActiveRecordInterface> extends ActiveSelectInterface<R>, List<R> 
 {
-	public ActiveListInterface reload();
+	public ActiveListInterface<R> reload();
 	
 	public void deleteAll();
 	
