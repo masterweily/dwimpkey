@@ -116,11 +116,13 @@ class ActiveTable<R extends ActiveRecord> implements ActiveTableInterface<R>
 		R newModel = null;
 		try 
 		{
-			newModel = (R) modelClass.getConstructor(Cursor.class).newInstance(cursor);
+			newModel = (R) modelClass.getConstructor().newInstance();
+			newModel.parseCursor(cursor);
 		} 
 		catch (Exception e) 
 		{
 			e.printStackTrace();
+			Log.d("modelClass", modelClass.getSimpleName());
 			return null;
 		}
 		return newModel;

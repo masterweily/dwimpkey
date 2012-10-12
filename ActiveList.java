@@ -6,16 +6,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import com.exr.xrxindusries.model.Book;
+
 import activerecord.ActiveRecord;
 import activerecord.interfaces.ActiveListInterface;
 
 
-class ActiveList<R extends ActiveRecord> implements ActiveListInterface<R>  
+public class ActiveList<R extends ActiveRecord> implements ActiveListInterface<R>  
 {
 	
 	private ArrayList<R> list = null;
 	private ActiveSelect<R> select = null;
-	
 	
 	
 	public ActiveList(ActiveTable<R> fromTable) 
@@ -23,6 +24,15 @@ class ActiveList<R extends ActiveRecord> implements ActiveListInterface<R>
 		select = new ActiveSelect<R>(fromTable);
 	}
 	
+	public ActiveList(Class<R> modelClass) 
+	{
+		this( (ActiveTable<R>) ActiveSchema
+									.getInstance()
+										.getTable(	ActiveRecord
+												.getContext(), 
+									modelClass) );
+	}
+
 	/*
 	 *  return the list member
 	 *  if null, instantiate it by executing the select
@@ -269,7 +279,15 @@ class ActiveList<R extends ActiveRecord> implements ActiveListInterface<R>
 		return list.addAll(index, collection);
 	}
 
-	
+	public String toString()
+	{
+		String str = "list: ";
+		for ( R record : this )
+		{
+			str += "\n{" + record + "}"; 
+		}
+		return str;
+	}
 
 	
 

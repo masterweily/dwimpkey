@@ -4,6 +4,9 @@ import android.content.ContentValues;
 
 public interface ActiveRecordInterface
 {
+	public ContentValues getValues();
+	
+	// Basic CRUD
 	
 	public long getId();
 	
@@ -11,6 +14,6 @@ public interface ActiveRecordInterface
 	
 	public void delete();
 	
-	public ContentValues getValues();
+	
 
 }

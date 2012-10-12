@@ -4,6 +4,7 @@ import activerecord.interfaces.ActiveRecordInterface;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 public class ActiveRecord implements ActiveRecordInterface
 {
@@ -17,22 +18,6 @@ public class ActiveRecord implements ActiveRecordInterface
     	super();
     }
     
-    public ActiveRecord(Cursor cursor)
-    {
-    	for ( ActiveColumn col : getCols() )
-    	{
-    		try 
-    		{
-				col.trySetValueFromCursor( this, cursor );
-			} 
-    		catch (Exception e) 
-    		{
-				e.printStackTrace();
-			} 
-    	}
-    	id = findId(cursor);
-    }
-   
 	private long findId(Cursor cursor) 
 	{
 		int index = cursor.getColumnIndex("id");
@@ -134,5 +119,35 @@ public class ActiveRecord implements ActiveRecordInterface
 
 	public static Context getContext() {
 		return context;
+	}
+	
+	public void parseCursor(Cursor cursor)
+	{
+		Log.d( "cols", ""+getCols().length );
+		for ( ActiveColumn col : getCols() )
+    	{
+			
+    		try 
+    		{
+				col.trySetValueFromCursor( this, cursor );
+			} 
+    		catch (Exception e) 
+    		{
+				e.printStackTrace();
+			} 
+    	}
+    	id = findId(cursor);
+	}
+	
+	public String toString()
+	{
+		String str = "id: " + this.id;
+		
+		for ( ActiveColumn col : getCols() )
+    	{
+    		str +=	", " 	+ 	col.getName() + ": "
+    						+	col.getStringValue(this);	
+    	}
+		return str;		
 	}
 }

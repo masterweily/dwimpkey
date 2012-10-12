@@ -41,6 +41,8 @@ public class ActiveSchema implements ActiveSchemaInterface<ActiveTable<?>>
 		ActiveTable<?> table = confirmTableInstance(context, modelClass);				
 		return table;
 	}
+	
+
 
 	private ActiveTable<?> confirmTableInstance(Context context, Class<?> modelClass) 
 	{
@@ -56,6 +58,8 @@ public class ActiveSchema implements ActiveSchemaInterface<ActiveTable<?>>
 		}
 		return table;
 	}
+	
+	
 
 	public Collection<ActiveTable<?>> getTables() 
 	{
@@ -91,5 +95,6 @@ public class ActiveSchema implements ActiveSchemaInterface<ActiveTable<?>>
 	{
 		return ActiveConfig.VERSION;
 	}
+
 
 }

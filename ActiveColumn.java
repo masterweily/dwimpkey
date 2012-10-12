@@ -8,14 +8,16 @@ import android.util.Log;
 class ActiveColumn 
 {
 	private String name;
-	private SQLiteDataType type;
+	private String javaType;
+	private SQLiteDataType sqlType;
 	private Field field;
 	
 	public ActiveColumn(Field field) 
 	{
 		this.field = field;
 		name = field.getName();
-		type = new SQLiteDataType( field.getType().getSimpleName() );		
+		javaType = field.getType().getSimpleName();
+		sqlType = new SQLiteDataType( javaType );		
 	}
 	
 	public String getName()
@@ -25,7 +27,7 @@ class ActiveColumn
 	
 	public String getType()
 	{
-		return type.toString();
+		return sqlType.toString();
 	}
 
 	public String getStringValue(ActiveRecord row) 
@@ -57,23 +59,23 @@ class ActiveColumn
 		
 		String type = field.getType().getSimpleName();
 			
-		if ( type == "int" )
+		if ( javaType.equals("int") )
 		{
 			field.set( record, cursor.getInt(index) );
 		}
-		else if ( type == "long" )
+		else if ( javaType.equals("long") )
 		{
 			field.set(record, cursor.getLong(index));	
 		}
-		else if ( type == "double" )
+		else if ( javaType.equals("double") )
 		{
 			field.set(record, cursor.getDouble(index));	
 		}
-		else if ( type == "float" )
+		else if ( javaType.equals("float") )
 		{
 			field.set(record, cursor.getFloat(index));	
 		}
-		else if ( type == "String" )
+		else if ( javaType.equals("String") )
 		{
 			field.set(record, cursor.getString(index));	
 		}		
