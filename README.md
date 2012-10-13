@@ -9,11 +9,11 @@ Active Record implementation for android apps
 
 <h3>Getting Started</h3>
 
-Download, install and configure the library in your project
+Download, install and configure the library into your project
 
 1. <b>download</b> all the files in the repository
 2. <b>install</b> the library by adding the downloaded files to your project as a package
-3. <b>configure</b> the library by edditing the ActiveConfig.java file:
+3. <b>configure</b> the library by edditing the <i>ActiveConfig.java</i> file:
 
 ```java
 public class ActiveConfig 
@@ -22,18 +22,18 @@ public class ActiveConfig
 	 * ActiveField Name
 	 * 
 	 * should be manually incremented any time you apply changes in the models
-	 * that should affect the ActiveField schema
+	 * that should affect the Database schema
 	 * 
 	 * Recommended format:  "*.db"
 	 * 
 	 */
-	public static final String ActiveField_NAME = "dwimpkey.db"; 
+	public static final String DATABASE_NAME = "dwimpkey.db"; 
 	
 	/*
 	 * ActiveField Version
 	 * 
 	 * should be manually incremented after any set of changes in 
-	 * the model classes decelerations that should effect the ActiveField schema
+	 * the model classes decelerations that should effect the Database schema
 	 * 
 	 * must be > 0
 	 * 
@@ -97,7 +97,7 @@ public final class Product extends ActiveRecord
 Product product = new Product(); // create new instance
 product.name = "Computer";
 product.barcode = 1234;
-product.price = 99.9;
+product.price = 99.99;
 product.save();   //  save the new instance to the database
 ```
 
@@ -105,7 +105,7 @@ product.save();   //  save the new instance to the database
 
 ```java
 Product product = new Product.find(1); // find row where id=1
-product.price = 199.9;  // update a value in the object
+product.price = 199.99;  // update a value in the object
 product.save();   //  save the updated object back to the database
 ```
 
@@ -114,7 +114,7 @@ product.save();   //  save the updated object back to the database
 new Product.find(1).delete(); // find row where id=1 and delete it frome the database
 ```
 
-<h5>Select Query</h5>
+<h3>Select Queries</3>
 
 <b>Select All Rows</b>
 
@@ -134,7 +134,7 @@ SELECT * FROM products;
 ActiveList<Product> products = 	 new ActiveList<Product>(Product.class)
 										.where("price>50")
 										.where("price<200")
-										.name("name<>'Bad Product'")
+										.where("name<>'Bad Product'")
 										.order("price ASC")
 										.order("name DESC")
 										.limit(10);
@@ -144,13 +144,13 @@ generates:
 SELECT * 	FROM products 
 WHERE 		price > 50 
 AND 		price < 200
-AND			name<>'Bad Product'
+AND		name<>'Bad Product'
 ORDER_BY	price ASC, name DESC
 LIMIT		10;
 ```
 
 
-<h5>Relations - NOT IMPLEMENTED YET</h5>
+<h3>Relations - ALL BELOWS ARE NOT IMPLEMENTED YET</h3>
 
 <b>One To One</b>
 
@@ -200,7 +200,7 @@ public final class Resturant extends ActiveRecord
 	public ActiveList<Employee> employees;
 }
 
-@ActiveModel(version=1)
+
 public final class Employee extends ActiveRecord
 {
 	@ActiveField
@@ -227,13 +227,13 @@ decleration:
 
 public final class SourceCode extends ActiveRecord
 {
-	@ActiveRelation  // no need for (as="souresCode"), as it's the default
+	@ActiveRelation  // no need for (as="souresCodes"), as it's the default
 	public ActiveList<Programmer> contributers;
 }
 
 public final class Programmer extends ActiveRecord
 {
-	@ActiveRelation(as="contributer")
+	@ActiveRelation(as="contributers")
 	public ActiveList<SourceCode> sourceCodes;
 }
 ```
