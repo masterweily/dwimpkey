@@ -4,15 +4,37 @@ import com.exr.xrxindusries.model.*;
 
 public class ActiveConfig 
 {
-
-	public static final String DATABASE_NAME = "dwimpkey.db"; // *.db
+	/*
+	 * Database Name
+	 * 
+	 * should be manually incremented any time you apply changes in the models
+	 * that should affect the database schema
+	 * 
+	 * Recommended format:  "*.db"
+	 * 
+	 */
+	public static final String DATABASE_NAME = "dwimpkey.db"; 
 	
-	public static final int VERSION = 6; // must be > 0
+	/*
+	 * Database Version
+	 * 
+	 * should be manually incremented after any set of changes in 
+	 * the model classes decelerations that should effect the database schema
+	 * 
+	 * must be > 0
+	 * 
+	 */
+	public static final int VERSION = 6;  
 
-	// list of the classes invited to the party
+	
+	/*
+	 * list all of your models that will behave as ActiveRecord
+	 * 
+	 * all of them must extend ActiveRecord as well
+	 */	
 	public static Class<?>[] getActiveModels()
 	{
 		return new Class[] { 	Product.class, 
-								Book.class	};
+								Book.class		};
 	}
 }

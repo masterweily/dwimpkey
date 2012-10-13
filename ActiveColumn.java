@@ -67,6 +67,10 @@ class ActiveColumn
 		{
 			field.set(record, cursor.getLong(index));	
 		}
+		else if ( javaType.equals("short") )
+		{
+			field.set(record, cursor.getShort(index));	
+		}
 		else if ( javaType.equals("double") )
 		{
 			field.set(record, cursor.getDouble(index));	
