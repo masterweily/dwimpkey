@@ -92,7 +92,7 @@ public class ActiveSelect<R extends ActiveRecord> implements ActiveSelectInterfa
 	public String getOrder() 
 	{
 		String SPLITER = ", ";
-		return wheres.isEmpty() ? null : join(wheres, SPLITER);
+		return orders.isEmpty() ? null : join(orders, SPLITER);
 	}
 
 

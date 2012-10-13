@@ -196,7 +196,7 @@ public class ActiveList<R extends ActiveRecord> implements ActiveListInterface<R
 	{
 		for ( ActiveRecord record : getList() )
 		{
-			record.delete();
+			record.save();
 		}		
 	}
 

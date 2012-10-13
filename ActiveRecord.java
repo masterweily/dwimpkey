@@ -30,32 +30,7 @@ public class ActiveRecord implements ActiveRecordInterface
     }
     
    
-     
-//    private ActiveList<ActiveRecord> newList() 
-//    {
-//    	return new ActiveList<ActiveRecord>
-//    	( 
-//    			ActiveSchema.getInstance()
-//    					.getTable(context, this.getClass())
-//    	);
-//	}
-
-	
-//	private static ActiveRecord selfInstance() 
-//	{
-//		
-//		try {
-//			return (ActiveRecord) selfClass().getConstructor().newInstance();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		return null; 		
-//	}
-//	
-//	private static Class<?> selfClass()
-//	{
-//		return new Object() {}.getClass().getEnclosingClass();
-//	}
+   
 
 	public void save()
     {

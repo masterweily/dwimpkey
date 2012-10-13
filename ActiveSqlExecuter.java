@@ -39,6 +39,7 @@ public class ActiveSqlExecuter<R extends ActiveRecord, S extends ActiveSelect<R>
 				activeSelect.getOrder(),				// orderBy 
 				activeSelect.getLimit()				// limit
 				);
+		Log.d("SELECT sql", sql);
 		
 		SQLiteDatabase db = ActiveSqlHelper.getInstance(table).getWritableDatabase();
 		
