@@ -29,12 +29,10 @@ public class ActiveRecord implements ActiveRecordInterface
     	context = newContext; 		
     }
     
-   
-   
 
 	public void save()
     {
-    	ActiveTable<?> table = ActiveSchema.getInstance().getTable( context, this.getClass() ); 
+    	ActiveTable<?> table = getTable(); 
     	ActiveSqlExecuter executer = new ActiveSqlExecuter(table);
     	
     	if ( this.hasValidId() ) // case old record 
@@ -49,7 +47,7 @@ public class ActiveRecord implements ActiveRecordInterface
     
     public void delete()
     {
-    	ActiveTable<?> table = ActiveSchema.getInstance().getTable( context, this.getClass() );
+    	ActiveTable<?> table = getTable();
     	if ( this.hasValidId() )
     	{
     		if ( new ActiveSqlExecuter(table).deleteRow(this) )
@@ -124,5 +122,13 @@ public class ActiveRecord implements ActiveRecordInterface
     						+	col.getStringValue(this);	
     	}
 		return str;		
+	}
+
+	public ActiveRecordInterface find(long id) 
+	{
+		ActiveTable<?> table = getTable(); 
+    	ActiveSqlExecuter executer = new ActiveSqlExecuter(table);
+    	executer.find(this, id);
+    	return this;
 	}
 }

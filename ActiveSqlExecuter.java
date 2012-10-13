@@ -30,15 +30,16 @@ public class ActiveSqlExecuter<R extends ActiveRecord, S extends ActiveSelect<R>
 	public ArrayList<R> select(S activeSelect) 
 	{
 		String sql = SQLiteQueryBuilder.buildQueryString( 
-				activeSelect.getDistinct(),  		    // distinct 
-				activeSelect.getTableName(), 			// table name
+				activeSelect.getDistinct(),  		// distinct 
+				activeSelect.getTableName(), 		// table name
 				activeSelect.getCulomns(), 			// columns
-				activeSelect.getWhere(), 				// where
-				activeSelect.getGroup(), 			    // group by
+				activeSelect.getWhere(), 			// where
+				activeSelect.getGroup(), 			// group by
 				activeSelect.getHaving(), 			// having
-				activeSelect.getOrder(),				// orderBy 
+				activeSelect.getOrder(),			// orderBy 
 				activeSelect.getLimit()				// limit
-				);
+				); // (-;
+		
 		Log.d("SELECT sql", sql);
 		
 		SQLiteDatabase db = ActiveSqlHelper.getInstance(table).getWritableDatabase();
@@ -58,33 +59,29 @@ public class ActiveSqlExecuter<R extends ActiveRecord, S extends ActiveSelect<R>
 		return records;
 	}
 
-	public R find(long id) 
+	public void find(R record, long id) 
 	{
 		String sql = SQLiteQueryBuilder.buildQueryString( 
-						false,  		// distinct 
-						null, 			// table name
-						null, 			// columns
-						"id=" + id,    	// where
-						null, 			// group by
-						null, 			// having
-						null,			// orderBy 
-						"1"			    // limit
-						);
+						false,  			// distinct 
+						table.getName(), 	// table name
+						null, 				// columns
+						"id=" + id,    		// where
+						null, 				// group by
+						null, 				// having
+						null,				// orderBy 
+						"1"			    	// limit
+						); // (-;
 		
 		SQLiteDatabase db = ActiveSqlHelper.getInstance(table).getWritableDatabase();
 		
 		Cursor cursor = db.rawQuery(sql, null);
 		
-		R record = null;
-		
 		if ( cursor.moveToNext() )
 		{
-			record =  (R) table.parseCursor(cursor);
+			record.parseCursor(cursor);
 		}
 		cursor.close();
 		db.close();
-		
-		return record;
 	}
 
 	public long addRow(ActiveRecord activeRecord)

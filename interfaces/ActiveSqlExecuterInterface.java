@@ -7,7 +7,7 @@ public interface ActiveSqlExecuterInterface< R extends ActiveRecordInterface,
 {
 	List<R> 				select		( S select );
 	
-	R						find		( long id );
+	void					find		( R record, long id );
 	
 	long					addRow		( R record );
 	

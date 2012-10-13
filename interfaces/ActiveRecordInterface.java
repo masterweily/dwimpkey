@@ -14,6 +14,10 @@ public interface ActiveRecordInterface
 	
 	public void delete();
 	
+	// basic queries
+	
+	public ActiveRecordInterface find(long id);
+	
 	
 
 }
