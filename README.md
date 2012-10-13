@@ -19,7 +19,7 @@ Download, install and configure the library into your project
 public class ActiveConfig 
 {
 	/*
-	 * ActiveField Name
+	 * Database Name
 	 * 
 	 * should be manually incremented any time you apply changes in the models
 	 * that should affect the Database schema
@@ -30,7 +30,7 @@ public class ActiveConfig
 	public static final String DATABASE_NAME = "dwimpkey.db"; 
 	
 	/*
-	 * ActiveField Version
+	 * Database Version
 	 * 
 	 * should be manually incremented after any set of changes in 
 	 * the model classes decelerations that should effect the Database schema
