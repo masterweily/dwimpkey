@@ -21,9 +21,6 @@ public class ActiveConfig
 	/*
 	 * Database Name
 	 * 
-	 * should be manually incremented any time you apply changes in the models
-	 * that should affect the Database schema
-	 * 
 	 * Recommended format:  "*.db"
 	 * 
 	 */
@@ -104,19 +101,20 @@ product.save();   //  save the new instance to the database
 <h5>Find and Update Row</h5>
 
 ```java
-Product product = new Product.find(1); // find row where id=1
+Product product = new Product().find(1); // find row where id=1
 product.price = 199.99;  // update a value in the object
 product.save();   //  save the updated object back to the database
 ```
 
 <h5>Delete</h5>
+
 ```java
-new Product.find(1).delete(); // find row where id=1 and delete it frome the database
+new Product().find(1).delete(); // find row where id=1 and delete it frome the database
 ```
 
-<h3>Select Queries</3>
+<h3>Select Queries</h3>
 
-<b>Select All Rows</b>
+<b>Select All Rows In Table</b>
 
 ```java
 Product[] products = new ActiveList<Product>(Product.class).toArray();
@@ -140,12 +138,14 @@ ActiveList<Product> products = 	 new ActiveList<Product>(Product.class)
 										.limit(10);
 ```					
 generates:
+
 ```sql
-SELECT * 	FROM products 
-WHERE 		price > 50 
-AND 		price < 200
-AND		name<>'Bad Product'
-ORDER_BY	price ASC, name DESC
+SELECT 		* 
+FROM 		products 
+WHERE 		price>50 
+AND 		price<200
+AND			name<>'Bad Product'
+ORDER BY	price ASC, name DESC
 LIMIT		10;
 ```
 
@@ -179,13 +179,13 @@ Usage:
 
 ```java
 Costumer costumer = new Costumer.find(1);
-int acount_id = costumer.acount.getId();  // get the costumer's acount id with no ActiveField query
+int acount_id = costumer.acount.getId();  // get the costumer's acount id with no database query
 Acount acount = costumer.acount.get();  // get the costumers's acount, with a select query.
 Acount acount2 = costumer.acount.get(); // no query this time, the data is allready loaded.
 
 Acount acount3 = new Acount.find(1);
 int id_1 = acount3.costumer.getId();  // this one will generate a query, because acounts doesnt hold a foreign key
-int id_2 = acount3.costumer.get().getId(); // this one is better, couse now the costumer is fully loaded
+int id_2 = acount3.costumer.get().getId(); // this one is better, becouse now the costumer is fully loaded
 ```
 
 <b>One To Many</b>
