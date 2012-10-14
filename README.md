@@ -114,7 +114,7 @@ product.save();   //  save the new instance to the database
 <h5>Find and Update Row</h5>
 
 ```java
-Product product = new Product().find(1); // find row where id=1
+Product product = (Product) new Product().find(1); // find row where id=1
 product.price = 199.99;  // update a value in the object
 product.save();   //  save the updated object back to the database
 ```
