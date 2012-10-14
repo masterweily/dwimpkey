@@ -53,6 +53,19 @@ public class ActiveConfig
 
 <h3>Documentation</h3>
 
+<h5>Init ActiveRecord for each context</h5>
+
+on the onCreate() method at the activity:
+
+```java
+@Override
+public void onCreate(Bundle savedInstanceState) 
+{
+    super.onCreate(savedInstanceState);
+    ActiveRecord.setContext(this);
+}
+```
+
 <h5>Declare a Model Class</h5>
 
 Here is how to generate a table named 'products' with auto incremented primary key named 'id'
