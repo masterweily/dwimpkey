@@ -51,8 +51,6 @@ public class ActiveConfig
 }
 ```
 
-<h3>Documentation</h3>
-
 <h5>Init ActiveRecord for each context</h5>
 
 on the onCreate() method at the activity:
@@ -62,9 +60,13 @@ on the onCreate() method at the activity:
 public void onCreate(Bundle savedInstanceState) 
 {
     super.onCreate(savedInstanceState);
-    ActiveRecord.setContext(this);
+    ActiveRecord.setContext(this);   	// VERY IMPORTANT! 
 }
 ```
+
+<h3>Documentation</h3>
+
+
 
 <h5>Declare a Model Class</h5>
 
@@ -185,7 +187,7 @@ public final class Acount extends ActiveRecord
 	public String 	name;
 	
 	@ActiveRelation(as="bill")
-	public ActiveList<Costumer> costumer;    // now related to a forien key named: 'bill_id' in table 'costumers' 
+	public Costumer costumer;    // now related to a forien key named: 'bill_id' in table 'costumers' 
 }
 ```
 Usage:
